@@ -22,6 +22,10 @@ public class ConnectionActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_connection);
 
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP) {
+            getWindow().setStatusBarColor(getResources().getColor(R.color.primary));
+        }
+
         ipEditText = findViewById(R.id.ipEditText);
         portEditText = findViewById(R.id.portEditText);
         connectButton = findViewById(R.id.connectButton);
@@ -48,7 +52,6 @@ public class ConnectionActivity extends AppCompatActivity {
             intent.putExtra("server_ip", ip);
             intent.putExtra("server_port", port);
             startActivity(intent);
-            finish();
         });
     }
 }
