@@ -3,17 +3,117 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/main"
+    android:background="@color/white"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="200dp"
+        android:orientation="vertical"
+        android:id="@+id/captors"
+        android:background="@color/primary"
+        app:layout_constraintTop_toTopOf="parent"
+
+
+        >
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:paddingStart="40dp"
+            android:layout_marginTop="16dp"
+            android:text="Sensor Data"
+            android:textSize="20dp"
+            android:id="@+id/sensor_data"
+            app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:paddingStart="50dp"
+            android:layout_marginTop="16dp"
+            android:text="temperature: "
+            android:id="@+id/temperature"
+            app:layout_constraintTop_toTopOf="parent" />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:paddingStart="50dp"
+            android:text="humidity: "
+            android:id="@+id/humidity"
+            app:layout_constraintTop_toBottomOf="@id/temperature"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:paddingStart="50dp"
+            android:text="luminosity: "
+            android:id="@+id/luminosity"
+            app:layout_constraintTop_toBottomOf="@id/humidity"
+            />
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/white"
+            android:paddingStart="50dp"
+            android:text="pressure: "
+            android:id="@+id/pressure"
+            app:layout_constraintTop_toBottomOf="@id/luminosity"
+            />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="540dp"
+        android:orientation="vertical"
+        android:id="@+id/captorSelectorContainer"
+        app:layout_constraintTop_toBottomOf="@id/captors"
+        app:layout_constraintBottom_toBottomOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:paddingStart="20dp"
+            android:textSize="20dp"
+            android:layout_marginTop="16dp"
+            android:text="slide the captors"
+            android:id="@+id/select_captor"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/captorSelector"
+            android:layout_width="match_parent"
+            android:layout_height="400dp"
+            android:background="@color/white"
+            android:paddingTop="6dp"
+            android:paddingStart="50dp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/captors"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/captorSelector"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            android:layout_marginStart="16dp">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Send captors order"
+                android:id="@+id/getCaptorOrderButton"
+                android:backgroundTint="@color/primary"
+                android:textColor="@color/white"
+                />
+        </LinearLayout>
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
