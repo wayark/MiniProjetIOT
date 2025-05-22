@@ -4,7 +4,9 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -27,6 +29,8 @@ public class MainActivity extends AppCompatActivity {
 
     private CaptorAdapter adapter;
     private MyThreadSender myThread;
+
+    private MyThreadReceiver myThreadReceiver;
 
 
     @Override
@@ -103,21 +107,88 @@ public class MainActivity extends AppCompatActivity {
         MyThreadEventListener listener = new MyThreadEventListener() {
             @Override
             public void onEventInMyThread(String data) {
-                new Handler(Looper.getMainLooper()).post(new Runnable() {
-                    @Override
-                    public void run() {
-                        TextView temperatureTextView = findViewById(R.id.temperature);
-                        TextView humidityTextView = findViewById(R.id.humidity);
-                        TextView luminosityTextView = findViewById(R.id.luminosity);
-                        TextView pressureTextView = findViewById(R.id.pressure);
+                new Handler(Looper.getMainLooper()).post(() -> {
+                    SensorData sensorData = SensorData.fromString(data);
+                    if(sensorData != null && sensorData.id != null) {
+                        updateOrCreateSquare(sensorData);
                     }
                 });
 
             }
         };
 
-//        MyThreadReceiver myThreadReceiver = new MyThreadReceiver(listener, Integer.parseInt(port));
-//        myThreadReceiver.start();
+        myThreadReceiver = new MyThreadReceiver(listener, ip, Integer.parseInt(port));
+        myThreadReceiver.start();
 
     }
+    public void updateOrCreateSquare(SensorData data) {
+        LinearLayout container = findViewById(R.id.sensorSquaresContainer);
+
+        // Try to find existing square by tag (ID)
+        View existing = container.findViewWithTag("microbit_" + data.id);
+
+        if (existing != null) {
+            // Update values
+            LinearLayout square = (LinearLayout) existing;
+            ((TextView) square.findViewWithTag("temp")).setText("Temperature: " + data.temperature + "°C");
+            ((TextView) square.findViewWithTag("hum")).setText("Humidity: " + data.humidity + "%");
+            ((TextView) square.findViewWithTag("lum")).setText("Luminosity: " + data.luminosity + " lux");
+            ((TextView) square.findViewWithTag("press")).setText("Pressure: " + data.pressure + " hPa");
+        } else {
+            // Create new square
+            LinearLayout square = new LinearLayout(this);
+            square.setOrientation(LinearLayout.VERTICAL);
+            square.setPadding(16, 16, 16, 16);
+            square.setBackgroundResource(R.drawable.rounded_square);
+            square.setLayoutParams(new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.MATCH_PARENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            ));
+            square.setElevation(8);
+            square.setTag("microbit_" + data.id); // Important: unique tag
+
+            // Title
+            TextView title = new TextView(this);
+            title.setText("Micro:bit ID: " + data.id);
+            title.setTextSize(18);
+            title.setPadding(0, 0, 0, 8);
+            square.addView(title);
+
+            // Temperature
+            TextView temp = new TextView(this);
+            temp.setText("🌡️: " + data.temperature + "°C");
+            temp.setTag("temp");
+            square.addView(temp);
+
+            // Humidity
+            TextView hum = new TextView(this);
+            hum.setText("🧊: " + data.humidity + "%");
+            hum.setTag("hum");
+            square.addView(hum);
+
+            // Luminosity
+            TextView lum = new TextView(this);
+            lum.setText("💡: " + data.luminosity + " lux");
+            lum.setTag("lum");
+            square.addView(lum);
+
+            // Pressure
+            TextView press = new TextView(this);
+            press.setText("🏋️: " + data.pressure + " hPa");
+            press.setTag("press");
+            square.addView(press);
+
+            // Add square to container
+            container.addView(square);
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        myThreadReceiver.stopThread();
+        myThreadReceiver.interrupt();
+        myThread.interrupt();
+    }
 }
+
