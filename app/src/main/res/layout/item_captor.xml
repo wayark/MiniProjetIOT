@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
-    android:padding="10dp"
+    android:padding="7dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:background="?android:attr/selectableItemBackground">
@@ -12,5 +12,5 @@
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         android:text="Captor"
-        android:textSize="18sp" />
+        android:textSize="15sp" />
 </LinearLayout>

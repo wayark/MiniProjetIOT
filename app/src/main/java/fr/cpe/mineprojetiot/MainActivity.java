@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -93,14 +94,7 @@ public class MainActivity extends AppCompatActivity {
         // send message to server
         Button getOrderButton = findViewById(R.id.getCaptorOrderButton);
         getOrderButton.setOnClickListener(v -> {
-            List<String> order = adapter.getCaptorOrder();
-            StringBuilder orderString = new StringBuilder();
-            for (String captor : order) {
-                String captorInitial = captor.substring(0, 1).toUpperCase();
-                orderString.append(captorInitial).append("");
-            }
-            System.out.println(orderString.toString());
-            myThread.sendMessage(orderString.toString());
+            onSendButtonCLicked();
         });
 
         //receive message from server
@@ -116,12 +110,21 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
+        SensorData data = new SensorData();
+        data.id = "1";
+        data.temperature = "0";
+        data.humidity = "0";
+        data.luminosity = "0";
+        data.pressure = "0";
+
+        updateOrCreateSquare(data);
+
 
         myThreadReceiver = new MyThreadReceiver(listener, ip, Integer.parseInt(port));
         myThreadReceiver.start();
 
     }
-    public void updateOrCreateSquare(SensorData data) {
+    protected void updateOrCreateSquare(SensorData data) {
         LinearLayout container = findViewById(R.id.sensorSquaresContainer);
 
         // Try to find existing square by tag (ID)
@@ -130,26 +133,33 @@ public class MainActivity extends AppCompatActivity {
         if (existing != null) {
             // Update values
             LinearLayout square = (LinearLayout) existing;
-            ((TextView) square.findViewWithTag("temp")).setText("Temperature: " + data.temperature + "°C");
-            ((TextView) square.findViewWithTag("hum")).setText("Humidity: " + data.humidity + "%");
-            ((TextView) square.findViewWithTag("lum")).setText("Luminosity: " + data.luminosity + " lux");
-            ((TextView) square.findViewWithTag("press")).setText("Pressure: " + data.pressure + " hPa");
+            if(data.temperature != null)
+                ((TextView) square.findViewWithTag("temp")).setText("🌡️: " + data.temperature + "°C");
+            if(data.humidity != null)
+                ((TextView) square.findViewWithTag("hum")).setText("🧊: " + data.humidity + "%");
+            if(data.luminosity != null)
+                ((TextView) square.findViewWithTag("lum")).setText("💡: " + data.luminosity + " lux");
+            if(data.pressure != null)
+                ((TextView) square.findViewWithTag("press")).setText("🏋️: " + data.pressure + " hPa");
         } else {
             // Create new square
             LinearLayout square = new LinearLayout(this);
             square.setOrientation(LinearLayout.VERTICAL);
             square.setPadding(16, 16, 16, 16);
             square.setBackgroundResource(R.drawable.rounded_square);
-            square.setLayoutParams(new LinearLayout.LayoutParams(
+            LinearLayout.LayoutParams params = new LinearLayout.LayoutParams(
                     LinearLayout.LayoutParams.MATCH_PARENT,
                     LinearLayout.LayoutParams.WRAP_CONTENT
-            ));
+            );
+            params.setMargins(16, 16, 16, 16);
+            square.setLayoutParams(params);
             square.setElevation(8);
             square.setTag("microbit_" + data.id); // Important: unique tag
 
             // Title
             TextView title = new TextView(this);
-            title.setText("Micro:bit ID: " + data.id);
+            title.setText("Microbit ID: " + data.id);
+            title.setTextColor(getResources().getColor(R.color.white));
             title.setTextSize(18);
             title.setPadding(0, 0, 0, 8);
             square.addView(title);
@@ -157,30 +167,68 @@ public class MainActivity extends AppCompatActivity {
             // Temperature
             TextView temp = new TextView(this);
             temp.setText("🌡️: " + data.temperature + "°C");
+            title.setTextColor(getResources().getColor(R.color.white));
             temp.setTag("temp");
             square.addView(temp);
 
             // Humidity
             TextView hum = new TextView(this);
             hum.setText("🧊: " + data.humidity + "%");
+            title.setTextColor(getResources().getColor(R.color.white));
             hum.setTag("hum");
             square.addView(hum);
 
             // Luminosity
             TextView lum = new TextView(this);
             lum.setText("💡: " + data.luminosity + " lux");
+            title.setTextColor(getResources().getColor(R.color.white));
             lum.setTag("lum");
             square.addView(lum);
 
             // Pressure
             TextView press = new TextView(this);
             press.setText("🏋️: " + data.pressure + " hPa");
+            title.setTextColor(getResources().getColor(R.color.white));
             press.setTag("press");
             square.addView(press);
 
+            // Send captor button
+            Button sendCaptorButton = new Button(this);
+            sendCaptorButton.setBackgroundResource(R.drawable.rounded_button);
+            sendCaptorButton.setText("Send captor order");
+            sendCaptorButton.setPadding(16, 8, 16, 8);
+            sendCaptorButton.setTextColor(getResources().getColor(R.color.black));
+            sendCaptorButton.setOnClickListener(v -> {
+                this.onSendButtonCLicked();
+            });
+            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                    LinearLayout.LayoutParams.WRAP_CONTENT,
+                    LinearLayout.LayoutParams.WRAP_CONTENT
+            );
+            buttonParams.topMargin = 24;
+            buttonParams.gravity = Gravity.CENTER;
+            sendCaptorButton.setLayoutParams(buttonParams);
+
+            square.addView(sendCaptorButton);
+
             // Add square to container
+            square.setOnClickListener(v -> {
+                // Handle click event
+                System.out.println("Clicked on square with ID: " + data.id);
+            });
             container.addView(square);
         }
+    }
+
+    protected void onSendButtonCLicked(){
+        List<String> order = adapter.getCaptorOrder();
+        StringBuilder orderString = new StringBuilder();
+        for (String captor : order) {
+            String captorInitial = captor.substring(0, 1).toUpperCase();
+            orderString.append(captorInitial).append("");
+        }
+        System.out.println(orderString.toString());
+        myThread.sendMessage(orderString.toString());
     }
 
     @Override
