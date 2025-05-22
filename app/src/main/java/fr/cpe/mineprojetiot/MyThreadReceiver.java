@@ -51,7 +51,6 @@ public class MyThreadReceiver extends Thread{
                     listener.onEventInMyThread(message);
                 } catch (SocketTimeoutException e) {
                     System.out.println("No response received after 10 seconds. Retrying...");
-                    // You can log or handle retries here
                 }
                 sleep(2000);
             } catch (IOException | InterruptedException e) { e.printStackTrace(); }

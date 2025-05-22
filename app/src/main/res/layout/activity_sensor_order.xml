@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:background="@color/offWhite"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".SensorOrderActivity">
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="@color/black"
+        android:textSize="20dp"
+        android:text="Microbit Id : X"
+        android:id="@+id/microbitId"
+        android:gravity="center"
+        android:background="@drawable/rounded_captor_select"
+        android:layout_marginBottom="10dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        android:paddingHorizontal="40dp"
+        app:layout_constraintBottom_toTopOf="@id/captorSelectorContainer"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="400dp"
+        android:orientation="vertical"
+        android:id="@+id/captorSelectorContainer"
+        app:layout_constraintBottom_toBottomOf="parent"
+        android:gravity="center"
+        android:background="@drawable/rounded_captor_select"
+        android:layout_marginHorizontal="20dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:textSize="20dp"
+            android:text="Changer l'ordre des capteurs"
+            android:id="@+id/select_captor"
+            android:gravity="center"
+            android:layout_marginBottom="10dp"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/captorSelector"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingTop="6dp"
+            android:layout_marginBottom="20dp"
+            android:layout_gravity="center"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/squareScroll"
+            />
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintTop_toBottomOf="@id/captorSelector"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintEnd_toEndOf="parent">
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Envoyer l'ordre"
+                android:id="@+id/getCaptorOrderButton"
+                android:backgroundTint="@color/primary"
+                android:textColor="@color/white"
+                />
+        </LinearLayout>
+    </LinearLayout>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

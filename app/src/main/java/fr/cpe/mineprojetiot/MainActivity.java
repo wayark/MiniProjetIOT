@@ -4,11 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.view.Gravity;
 import android.view.View;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
+
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -28,10 +27,9 @@ import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
-    private CaptorAdapter adapter;
-    private MyThreadSender myThread;
-
     private MyThreadReceiver myThreadReceiver;
+    private String ip;
+    private String port;
 
 
     @Override
@@ -48,38 +46,10 @@ public class MainActivity extends AppCompatActivity {
             return insets;
         });
 
-        List<String> captors = new ArrayList<>(Arrays.asList("temperature", "humidity", "luminosity", "pressure"));
-        adapter = new CaptorAdapter(captors);
-
-        RecyclerView recyclerView = findViewById(R.id.captorSelector);
-        recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setAdapter(adapter);
-
-        ItemTouchHelper.SimpleCallback callback = new ItemTouchHelper.SimpleCallback(
-                ItemTouchHelper.UP | ItemTouchHelper.DOWN, 0) {
-            @Override
-            public boolean onMove(RecyclerView recyclerView,
-                                  RecyclerView.ViewHolder viewHolder,
-                                  RecyclerView.ViewHolder target) {
-                int fromPosition = viewHolder.getAdapterPosition();
-                int toPosition = target.getAdapterPosition();
-                adapter.moveItem(fromPosition, toPosition);
-                return true;
-            }
-
-            @Override
-            public void onSwiped(RecyclerView.ViewHolder viewHolder, int direction) {
-                // Not used
-            }
-        };
-
-        ItemTouchHelper itemTouchHelper = new ItemTouchHelper(callback);
-        itemTouchHelper.attachToRecyclerView(recyclerView);
-
         // get ip from connection activity
         Intent intent = getIntent();
-        String ip = intent.getStringExtra("server_ip");
-        String port = intent.getStringExtra("server_port");
+        this.ip = intent.getStringExtra("server_ip");
+        this.port = intent.getStringExtra("server_port");
 
         if (ip == null || port == null) {
             //return to connection activity
@@ -88,14 +58,6 @@ public class MainActivity extends AppCompatActivity {
             finish();
             return;
         }
-        myThread = new MyThreadSender(ip, Integer.parseInt(port));
-        myThread.start();
-
-        // send message to server
-        Button getOrderButton = findViewById(R.id.getCaptorOrderButton);
-        getOrderButton.setOnClickListener(v -> {
-            onSendButtonCLicked();
-        });
 
         //receive message from server
         MyThreadEventListener listener = new MyThreadEventListener() {
@@ -110,14 +72,6 @@ public class MainActivity extends AppCompatActivity {
 
             }
         };
-        SensorData data = new SensorData();
-        data.id = "1";
-        data.temperature = "0";
-        data.humidity = "0";
-        data.luminosity = "0";
-        data.pressure = "0";
-
-        updateOrCreateSquare(data);
 
 
         myThreadReceiver = new MyThreadReceiver(listener, ip, Integer.parseInt(port));
@@ -192,43 +146,22 @@ public class MainActivity extends AppCompatActivity {
             press.setTag("press");
             square.addView(press);
 
-            // Send captor button
-            Button sendCaptorButton = new Button(this);
-            sendCaptorButton.setBackgroundResource(R.drawable.rounded_button);
-            sendCaptorButton.setText("Send captor order");
-            sendCaptorButton.setPadding(16, 8, 16, 8);
-            sendCaptorButton.setTextColor(getResources().getColor(R.color.black));
-            sendCaptorButton.setOnClickListener(v -> {
-                this.onSendButtonCLicked();
-            });
-            LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
-                    LinearLayout.LayoutParams.WRAP_CONTENT,
-                    LinearLayout.LayoutParams.WRAP_CONTENT
-            );
-            buttonParams.topMargin = 24;
-            buttonParams.gravity = Gravity.CENTER;
-            sendCaptorButton.setLayoutParams(buttonParams);
-
-            square.addView(sendCaptorButton);
-
             // Add square to container
             square.setOnClickListener(v -> {
                 // Handle click event
-                System.out.println("Clicked on square with ID: " + data.id);
+                onSensorSquareClicked(data.id);
             });
             container.addView(square);
         }
     }
 
-    protected void onSendButtonCLicked(){
-        List<String> order = adapter.getCaptorOrder();
-        StringBuilder orderString = new StringBuilder();
-        for (String captor : order) {
-            String captorInitial = captor.substring(0, 1).toUpperCase();
-            orderString.append(captorInitial).append("");
-        }
-        System.out.println(orderString.toString());
-        myThread.sendMessage(orderString.toString());
+    protected void onSensorSquareClicked(String sensorId){
+        // Optionally save values using SharedPreferences
+        Intent intent = new Intent(MainActivity.this, SensorOrderActivity.class);
+        intent.putExtra("server_ip", ip);
+        intent.putExtra("server_port", port);
+        intent.putExtra("sensor_id", sensorId);
+        startActivity(intent);
     }
 
     @Override
@@ -236,7 +169,6 @@ public class MainActivity extends AppCompatActivity {
         super.onDestroy();
         myThreadReceiver.stopThread();
         myThreadReceiver.interrupt();
-        myThread.interrupt();
     }
 }
 

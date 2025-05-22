@@ -4,7 +4,8 @@
     android:padding="7dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="?android:attr/selectableItemBackground">
+    android:background="?android:attr/selectableItemBackground"
+    android:gravity="center">
 
     <TextView
         android:id="@+id/captorLabel"
@@ -12,5 +13,7 @@
         android:layout_height="wrap_content"
         android:textColor="@color/black"
         android:text="Captor"
-        android:textSize="15sp" />
+        android:background="@drawable/rounded_captor_item"
+        android:textSize="15sp"
+        android:gravity="center"/>
 </LinearLayout>
